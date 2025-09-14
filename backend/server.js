@@ -37,6 +37,7 @@ if (process.env.DATABASE_URL) {
 db.connect()
   .then(() => console.log('✅ PostgreSQL Connected...'))
   .catch((err) => console.error('❌ PostgreSQL connection error:', err));
+console.log('DATABASE_URL:', process.env.DATABASE_URL ? process.env.DATABASE_URL.replace(/:(.*)@/, ':******@') : 'NOT SET');
 
 // Auto-run init.sql to create tables if they don't exist
 const initSqlPath = path.join(__dirname, 'init.sql');
