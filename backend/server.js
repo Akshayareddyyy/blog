@@ -3,40 +3,16 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-const { Pool } = require('pg');
 
 const authRoutes = require('./routes/auth');
 const blogRoutes = require('./routes/blog');
+const db = require('./models/db'); // <-- import your db.js pool
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// --------------------
-// PostgreSQL connection
-// --------------------
-const db = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // required for Render
-});
-
-db.connect()
-  .then(() => console.log("✅ Connected to Postgres via DATABASE_URL"))
-  .catch(err => console.error("❌ Postgres connection error:", err));
-
-// --------------------
-// Auto-run init.sql
-// --------------------
-const initSqlPath = path.join(__dirname, 'init.sql');
-const initSql = fs.readFileSync(initSqlPath, 'utf8');
-
-db.query(initSql)
-  .then(() => console.log('✅ Tables created or verified'))
-  .catch(err => console.error('❌ Error initializing tables:', err));
-
-// --------------------
 // Make db accessible in routes
-// --------------------
 app.locals.db = db;
 
 // --------------------
@@ -55,7 +31,10 @@ app.post("/api/contact", async (req, res) => {
   }
 
   try {
-    await db.query("INSERT INTO contacts (name, email, message) VALUES ($1, $2, $3)", [name, email, message]);
+    await db.query(
+      "INSERT INTO contacts (name, email, message) VALUES ($1, $2, $3)",
+      [name, email, message]
+    );
     res.json({ message: "Message sent successfully!" });
   } catch (err) {
     console.error(err);
