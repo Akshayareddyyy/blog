@@ -147,6 +147,8 @@
   <script>
     // Dynamic navbar
     const user = JSON.parse(localStorage.getItem("user"));
+    const API_URL = "https://blog-5-c1yh.onrender.com";
+
     const nav = document.querySelector("nav");
     nav.innerHTML = `
       <a href="index.html">Home</a>
@@ -177,11 +179,12 @@
       const message = document.getElementById("message").value;
 
       try {
-        const response = await fetch("http://localhost:5500/api/contact", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, message }),
-        });
+        const response = await fetch(`${API_URL}/api/contact`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ name, email, message }),
+});
+
 
         const data = await response.json();
         if (response.ok) {
@@ -198,3 +201,4 @@
   </script>
 </body>
 </html>
+
