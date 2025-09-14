@@ -145,6 +145,7 @@
     // Dynamic nav bar
     const user = JSON.parse(localStorage.getItem("user"));
     const nav = document.querySelector("nav");
+    const API_URL = "";
     nav.innerHTML = `
       <a href="index.html">Home</a>
       <a href="blogs.html" class="active">Blogs</a>
@@ -169,7 +170,7 @@
     // Fetch and display all blogs
     async function renderBlogs() {
       // ✅ changed from 5500 → 5000
-      const res = await fetch('http://localhost:5000/api/blog');
+     const res = await fetch(`${API_URL}/api/blog`);
       const blogs = await res.json();
       const blogList = document.getElementById("blogList");
       blogList.innerHTML = blogs.map(blog => `
