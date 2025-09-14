@@ -30,7 +30,7 @@
   </main>
 
   <script>
-    const API_URL = "http://localhost:5000"; // ✅ backend server
+    const API_URL = ""; // ✅ backend server
 
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -46,7 +46,7 @@
       }
 
       try {
-        const res = await fetch(${API_URL}/api/auth/login, {
+        const res = await fetch(`${API_URL}/api/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password })
