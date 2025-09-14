@@ -185,13 +185,15 @@
       const category = document.getElementById("category").value;
       const tags = document.getElementById("tags").value;
       const content = document.getElementById("content").value;
+      const API_URL = "";
       try {
         // ✅ changed from 5500 → 5000
-        const res = await fetch('http://localhost:5000/api/blog', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, category, content, tags })
-        });
+       const res = await fetch(`${API_URL}/api/blog`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ title, category, content, tags })
+});
+
         if (!res.ok) {
           alert('Failed to publish blog.');
           return;
