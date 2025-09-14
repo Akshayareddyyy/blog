@@ -12,49 +12,56 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// PostgreSQL connection pool
-let db;
+// --------------------
+// PostgreSQL connection
+// --------------------
+const dbConfig = process.env.DATABASE_URL
+  ? { 
+      connectionString: process.env.DATABASE_URL, 
+      ssl: { rejectUnauthorized: false } // Render requires SSL
+    }
+  : {
+      host: process.env.DB_HOST || '127.0.0.1',
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASSWORD || '',
+      database: process.env.DB_NAME || 'blog_app',
+      port: process.env.DB_PORT || 5432,
+    };
 
-if (process.env.DATABASE_URL) {
-  // ✅ Render (production)
-  db = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
-  });
-} else {
-  // ✅ Local development
-  db = new Pool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT || 5432
-  });
-}
+const db = new Pool(dbConfig);
 
-
-// Test DB connection
 db.connect()
   .then(() => console.log('✅ PostgreSQL Connected...'))
-  .catch((err) => console.error('❌ PostgreSQL connection error:', err));
-console.log('DATABASE_URL:', process.env.DATABASE_URL ? process.env.DATABASE_URL.replace(/:(.*)@/, ':******@') : 'NOT SET');
+  .catch(err => console.error('❌ PostgreSQL connection error:', err));
 
-// Auto-run init.sql to create tables if they don't exist
+console.log('DATABASE_URL:', process.env.DATABASE_URL 
+  ? process.env.DATABASE_URL.replace(/:(.*)@/, ':******@') 
+  : 'NOT SET');
+
+// --------------------
+// Auto-run init.sql
+// --------------------
 const initSqlPath = path.join(__dirname, 'init.sql');
 const initSql = fs.readFileSync(initSqlPath, 'utf8');
 
 db.query(initSql)
   .then(() => console.log('✅ Tables created or verified'))
-  .catch((err) => console.error('❌ Error initializing tables:', err));
+  .catch(err => console.error('❌ Error initializing tables:', err));
 
+// --------------------
 // Make db accessible in routes
+// --------------------
 app.locals.db = db;
 
+// --------------------
 // API Routes
+// --------------------
 app.use('/api/auth', authRoutes);
 app.use('/api/blog', blogRoutes);
 
+// --------------------
 // Contact API
+// --------------------
 app.post("/api/contact", async (req, res) => {
   const { name, email, message } = req.body;
   if (!name || !email || !message) {
@@ -62,8 +69,7 @@ app.post("/api/contact", async (req, res) => {
   }
 
   try {
-    const query = "INSERT INTO contacts (name, email, message) VALUES ($1, $2, $3)";
-    await db.query(query, [name, email, message]);
+    await db.query("INSERT INTO contacts (name, email, message) VALUES ($1, $2, $3)", [name, email, message]);
     res.json({ message: "Message sent successfully!" });
   } catch (err) {
     console.error(err);
@@ -71,20 +77,24 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
+// --------------------
 // Serve frontend static files
+// --------------------
 const frontendPath = path.join(__dirname, '..', 'frontend');
 app.use(express.static(frontendPath));
 
-// SPA fallback for frontend routes
+// SPA fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
+// --------------------
 // Start server
+// --------------------
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
-  console.log(`👉 Open: http://localhost:${PORT}`);  // ✅ Clickable link
+  console.log(`👉 Open: http://localhost:${PORT}`);
 });
 
-module.exports = app; // Optional, useful for testing
+module.exports = app;
