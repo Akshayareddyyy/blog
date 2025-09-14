@@ -15,28 +15,14 @@ app.use(cors());
 // --------------------
 // PostgreSQL connection
 // --------------------
-const dbConfig = process.env.DATABASE_URL
-  ? { 
-      connectionString: process.env.DATABASE_URL, 
-      ssl: { rejectUnauthorized: false } // Render requires SSL
-    }
-  : {
-      host: process.env.DB_HOST || '127.0.0.1',
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || '',
-      database: process.env.DB_NAME || 'blog_app',
-      port: process.env.DB_PORT || 5432,
-    };
-
-const db = new Pool(dbConfig);
+const db = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false } // required for Render
+});
 
 db.connect()
-  .then(() => console.log('✅ PostgreSQL Connected...'))
-  .catch(err => console.error('❌ PostgreSQL connection error:', err));
-
-console.log('DATABASE_URL:', process.env.DATABASE_URL 
-  ? process.env.DATABASE_URL.replace(/:(.*)@/, ':******@') 
-  : 'NOT SET');
+  .then(() => console.log("✅ Connected to Postgres via DATABASE_URL"))
+  .catch(err => console.error("❌ Postgres connection error:", err));
 
 // --------------------
 // Auto-run init.sql
