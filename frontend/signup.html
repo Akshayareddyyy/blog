@@ -29,7 +29,7 @@ signup
     </form>
   </main>
   <script>
-    const API_URL = "http://localhost:5000"; // backend server
+    const API_URL = ""; // backend server
 
     document.getElementById("signupForm").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -46,11 +46,12 @@ signup
       }
 
       try {
-        const res = await fetch(${API_URL}/api/auth/signup, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, email, password })
-        });
+       const res = await fetch(`${API_URL}/api/auth/signup`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ username, email, password })
+});
+
 
         let data;
         try {
