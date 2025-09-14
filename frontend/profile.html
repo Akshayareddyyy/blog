@@ -166,7 +166,8 @@
   // Fetch and show only user's blogs
   async function fetchUserBlogs() {
     try {
-      const res = await fetch(${API_URL}/api/blog, {
+      const res = await fetch(`${API_URL}/api/blog`, {
+
         headers: {
           "Content-Type": "application/json",
           "Authorization": Bearer ${localStorage.getItem("token") || ""}
@@ -211,10 +212,12 @@
   async function deleteBlog(id) {
     if (confirm('Are you sure you want to delete this blog?')) {
       try {
-        const res = await fetch(${API_URL}/api/blog/${id}, {
+       const res = await fetch(`${API_URL}/api/blog/${id}`, {
+
           method: 'DELETE',
           headers: {
-            "Authorization": Bearer ${localStorage.getItem("token") || ""}
+            "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+
           }
         });
         if (!res.ok) {
